@@ -123,6 +123,9 @@ public class Main {
                     System.out.println("Время самого раннего запроса: " + statistics.getMinTime());
                     System.out.println("Время самого позднего запроса: " + statistics.getMaxTime());
                     System.out.println("Объем часового трафика: " + statistics.getTrafficRate(statistics.getMinTime(), statistics.getMaxTime()));
+
+                    System.out.println("Список всех существующих страниц: " + statistics.getExistingPages());
+                    System.out.println("Пропорция по операционным системам: " + statistics.getOsStatisticsProportion());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
