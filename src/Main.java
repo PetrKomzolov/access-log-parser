@@ -125,7 +125,10 @@ public class Main {
                     System.out.println("Объем часового трафика: " + statistics.getTrafficRate(statistics.getMinTime(), statistics.getMaxTime()));
 
                     System.out.println("Список всех существующих страниц: " + statistics.getExistingPages());
+                    System.out.println("Список всех несуществующих страниц: " + statistics.getNonExistingPages());
+
                     System.out.println("Пропорция по операционным системам: " + statistics.getOsStatisticsProportion());
+                    System.out.println("Пропорция по браузерам: " + statistics.getBrowserStatisticsProportion());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
