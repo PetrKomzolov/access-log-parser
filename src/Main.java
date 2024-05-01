@@ -64,6 +64,8 @@ public class Main {
                     HashMap<Integer, String> refererPathMap = new HashMap<>(); //Путь к странице, с которой перешли на текущую страницу, — referer
                     HashMap<Integer, String> userAgentMap = new HashMap<>();//User-Agent — информация о браузере или другом клиенте, который выполнил запрос
 
+                    Statistics statistics = new Statistics();
+
                     while ((currentLine = reader.readLine()) != null) {
                         currentLineLength = currentLine.length();
 
@@ -83,6 +85,9 @@ public class Main {
                         }
 
                         linesCount++;
+
+                        LogEntry logEntry = new LogEntry(currentLine);
+                        statistics.addEntry(logEntry);
                     }
 
                     //Поиск GoogleBot или YandexBot внутри User-Agent (в первых скобках)
@@ -105,7 +110,6 @@ public class Main {
                             }
                         }
                     }
-
                     System.out.println("Общее количество строк в файле: " + linesCount);
 
                     System.out.println("Количество запросов от YandexBot: " + yandexBotCount);
@@ -115,6 +119,10 @@ public class Main {
                             + (double) yandexBotCount * 100 / linesCount);
                     System.out.println("Доля запросов от Googlebot от общего количества: "
                             + (double) googleBotCount * 100 / linesCount);
+
+                    System.out.println("Время самого раннего запроса: " + statistics.getMinTime());
+                    System.out.println("Время самого позднего запроса: " + statistics.getMaxTime());
+                    System.out.println("Объем часового трафика: " + statistics.getTrafficRate(statistics.getMinTime(), statistics.getMaxTime()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
