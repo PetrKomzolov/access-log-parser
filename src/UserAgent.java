@@ -1,6 +1,7 @@
 public class UserAgent {
     private final String browserName;
     private final String osTypeName;
+    private final boolean isBot;
 
     public UserAgent(String userAgent) {
         if (userAgent.contains("Windows")) this.osTypeName = "Windows";
@@ -23,6 +24,10 @@ public class UserAgent {
             this.browserName = "Opera";
         else
             this.browserName = "Other";
+
+        if (userAgent.contains("bot") || userAgent.contains("Bot"))
+            isBot = true;
+        else isBot = false;
     }
 
     public String getBrowserName() {
@@ -31,6 +36,10 @@ public class UserAgent {
 
     public String getOsTypeName() {
         return osTypeName;
+    }
+
+    public boolean isBot() {
+        return isBot;
     }
 
     @Override

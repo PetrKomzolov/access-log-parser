@@ -1,7 +1,5 @@
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +30,8 @@ public class Main {
 
             boolean fileExists = file.exists();
             boolean isDirectory = file.isDirectory();
+
+            List<LogEntry> entriesList = new ArrayList<>();
 
             if (!fileExists || isDirectory) {
                 System.out.println("Файл " + path + " не существует или путь является путем к папке");
@@ -88,6 +88,8 @@ public class Main {
 
                         LogEntry logEntry = new LogEntry(currentLine);
                         statistics.addEntry(logEntry);
+
+                        entriesList.add(logEntry);
                     }
 
                     //Поиск GoogleBot или YandexBot внутри User-Agent (в первых скобках)
@@ -129,6 +131,10 @@ public class Main {
 
                     System.out.println("Пропорция по операционным системам: " + statistics.getOsStatisticsProportion());
                     System.out.println("Пропорция по браузерам: " + statistics.getBrowserStatisticsProportion());
+
+                    System.out.println("Среднее количество посещений сайта за час: " + statistics.getAverageSiteVisitsPerHour(entriesList));
+                    System.out.println("Среднее количество ошибочных запросов в час: " + statistics.getAverageFailedRequestsPerHour(entriesList));
+                    System.out.println("Средняя посещаемость одним пользователем (не ботом): " + statistics.getAverageVisitsPerUser(entriesList));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

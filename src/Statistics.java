@@ -1,7 +1,6 @@
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class Statistics {
     private long totalTraffic;
@@ -13,10 +12,15 @@ public class Statistics {
     private HashMap<String, Integer> osStatistics = new HashMap<>();
     private HashMap<String, Integer> browserStatistics = new HashMap<>();
 
+    private int nonBotsCounter;
+    private int failedRequestsCounter;
+
     public Statistics() {
         this.totalTraffic = 0;
         this.minTime = LocalDateTime.MAX;
         this.maxTime = LocalDateTime.MIN;
+        this.nonBotsCounter = 0;
+        this.failedRequestsCounter = 0;
     }
 
     public LocalDateTime getMinTime() {
@@ -67,6 +71,9 @@ public class Statistics {
             osStatistics.merge(logEntry.getUserAgent().getOsTypeName(), 1, Integer::sum);
         }
         browserStatistics.merge(logEntry.getUserAgent().getBrowserName(), 1, Integer::sum);
+
+        if(!(logEntry.getUserAgent().isBot())) nonBotsCounter++;
+        if((logEntry.getResponseCode() >= 400) && (logEntry.getResponseCode() <= 599)) failedRequestsCounter++;
     }
 
     long getTrafficRate(LocalDateTime minTime, LocalDateTime maxTime) {
@@ -75,5 +82,48 @@ public class Statistics {
         System.out.println("Объем всего трафика: " + totalTraffic);
         long hourlyTraffic = totalTraffic/hourlyTimeDiff;
         return hourlyTraffic;
+    }
+
+    public long getAverageSiteVisitsPerHour(List<LogEntry> entriesList) {
+        LocalDateTime streamMinTime = entriesList
+                .stream()
+                .min(Comparator.comparing(LogEntry::getDateTime))
+                .orElseThrow(NoSuchElementException::new)
+                .getDateTime();
+
+        LocalDateTime streamMaxTime = entriesList
+                .stream()
+                .max(Comparator.comparing(LogEntry::getDateTime))
+                .orElseThrow(NoSuchElementException::new)
+                .getDateTime();
+
+        return nonBotsCounter / streamMinTime.until(streamMaxTime, ChronoUnit.HOURS);
+    }
+
+    public long getAverageFailedRequestsPerHour(List<LogEntry> entriesList) {
+        LocalDateTime streamMinTime = entriesList
+                .stream()
+                .min(Comparator.comparing(LogEntry::getDateTime))
+                .orElseThrow(NoSuchElementException::new)
+                .getDateTime();
+
+        LocalDateTime streamMaxTime = entriesList
+                .stream()
+                .max(Comparator.comparing(LogEntry::getDateTime))
+                .orElseThrow(NoSuchElementException::new)
+                .getDateTime();
+
+        return failedRequestsCounter / streamMinTime.until(streamMaxTime, ChronoUnit.HOURS);
+    }
+
+    public long getAverageVisitsPerUser(List<LogEntry> entriesList) {
+        long uniqueUserIPAddressCounter = entriesList
+                .stream()
+                .filter(u -> !(u.getUserAgent().isBot()))
+                .map(LogEntry::getIp)
+                .distinct()
+                .count();
+
+        return nonBotsCounter / uniqueUserIPAddressCounter;
     }
 }
