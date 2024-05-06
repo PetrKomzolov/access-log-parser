@@ -135,6 +135,10 @@ public class Main {
                     System.out.println("Среднее количество посещений сайта за час: " + statistics.getAverageSiteVisitsPerHour(entriesList));
                     System.out.println("Среднее количество ошибочных запросов в час: " + statistics.getAverageFailedRequestsPerHour(entriesList));
                     System.out.println("Средняя посещаемость одним пользователем (не ботом): " + statistics.getAverageVisitsPerUser(entriesList));
+
+                    System.out.println("Пиковая посещаемость сайта за секунду: " + statistics.getPeakVisitsBySecond(entriesList));
+                    System.out.println("Список доменов всех referer-ов: " + statistics.getReferringDomains(entriesList));
+                    System.out.println("Максимальная посещаемость сайта одним пользователем: " + statistics.getMaxVisitsByUser(entriesList));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

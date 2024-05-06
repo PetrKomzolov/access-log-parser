@@ -1,6 +1,11 @@
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
 
 public class Statistics {
     private long totalTraffic;
@@ -125,5 +130,42 @@ public class Statistics {
                 .count();
 
         return nonBotsCounter / uniqueUserIPAddressCounter;
+    }
+
+    public long getPeakVisitsBySecond(List<LogEntry> entriesList) {
+        Map<LocalDateTime, Long> allVisitsBySecond = entriesList
+                .stream()
+                .filter(u -> !(u.getUserAgent().isBot()))
+                .collect(groupingBy(LogEntry::getDateTime, counting()));
+
+        return allVisitsBySecond
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .get()
+                .getValue();
+    }
+
+    public HashSet<String> getReferringDomains(List<LogEntry> entriesList) {
+        return entriesList
+                .stream()
+                .map(LogEntry::getRefererPath)
+                .filter(Pattern.compile("^https?:\\/\\/(.*?)(?:[\\/?&#]|$)").asPredicate())
+                .map(e -> e.replaceAll("http(s)?://|www\\.|/.*", ""))
+                .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    public long getMaxVisitsByUser(List<LogEntry> entriesList) {
+        Map<String, Long> uniqueUsersVisitsCounter = entriesList
+                .stream()
+                .filter(u -> !(u.getUserAgent().isBot()))
+                .collect(groupingBy(LogEntry::getIp, counting()));
+
+        return uniqueUsersVisitsCounter
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .get()
+                .getValue();
     }
 }
